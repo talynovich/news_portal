@@ -26,6 +26,12 @@ export class UsersService {
     const { password, ...result } = savedUser;
     return result;
   }
+  findUserForAuth(email: string) {
+    return this.UsersRepository.findOne({
+      where: { email },
+      select: ['email', 'password', 'id', 'username'],
+    });
+  }
 
   findAll() {
     return `This action returns all users`;
