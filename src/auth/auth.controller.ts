@@ -6,9 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '../guards/auth.guard';
 import { AuthService } from './auth.service';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginDto } from './dto/login.dto';
@@ -22,8 +20,7 @@ export class AuthController {
     return this.authService.login(LoginDto);
   }
 
-  @UseGuards(AuthGuard)
-  @Get('test')
+  @Get('')
   findAll() {
     return this.authService.findAll();
   }

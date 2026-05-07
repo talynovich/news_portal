@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { News } from '../../news/entities/news.entity';
+import { Role } from '../../enums/role.enum';
 
 @Entity()
 export class Users {
@@ -8,9 +10,15 @@ export class Users {
   @Column()
   email: string;
 
-  @Column({ select: false }) // при запросе не будет выдавать пароль
+  @Column({ select: false })
   password: string;
 
   @Column()
   username: string;
+
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
+
+  @OneToMany(() => News, (news) => news.author)
+  news: News[];
 }

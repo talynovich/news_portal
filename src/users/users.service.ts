@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
@@ -33,8 +38,8 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return await this.UsersRepository.find();
   }
 
   findOne(id: number) {
@@ -45,7 +50,27 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number, userId: number) {
+    const currentUser = await this.UsersRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (currentUser?.role !== 'admin') {
+      throw new ForbiddenException('Only administrators can delete users.');
+    }
+
+    const userToDelete = await this.UsersRepository.findOne({ where: { id } });
+
+    if (!userToDelete) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    if (userToDelete.role === 'admin') {
+      throw new ForbiddenException('Cannot delete user with admin role');
+    }
+
+    await this.UsersRepository.delete(id);
+
+    return { message: `User ${id} successfully deleted` };
   }
 }
