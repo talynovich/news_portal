@@ -14,6 +14,7 @@ import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import type { RequestWithUser } from '../auth/interfaces/request-with-user.interfaces';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('news')
 export class NewsController {
@@ -24,8 +25,7 @@ export class NewsController {
   create(@Request() req: RequestWithUser, @Body() news: CreateNewsDto) {
     return this.newsService.create(+req.user.sub, news);
   }
-
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('all')
   findAll() {
     return this.newsService.findAll();

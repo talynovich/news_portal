@@ -9,6 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '../enums/role.enum';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class UsersService {
       password: hashedPassword,
     });
     const savedUser = await this.UsersRepository.save(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = savedUser;
     return result;
   }
@@ -54,23 +56,17 @@ export class UsersService {
     const currentUser = await this.UsersRepository.findOne({
       where: { id: userId },
     });
-
-    if (currentUser?.role !== 'admin') {
+    if (currentUser?.role !== Role.ADMIN) {
       throw new ForbiddenException('Only administrators can delete users.');
     }
-
     const userToDelete = await this.UsersRepository.findOne({ where: { id } });
-
     if (!userToDelete) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-
-    if (userToDelete.role === 'admin') {
+    if (userToDelete.role === Role.ADMIN) {
       throw new ForbiddenException('Cannot delete user with admin role');
     }
-
     await this.UsersRepository.delete(id);
-
     return { message: `User ${id} successfully deleted` };
   }
 }
