@@ -36,7 +36,7 @@ export class UsersService {
   findUserForAuth(email: string) {
     return this.UsersRepository.findOne({
       where: { email },
-      select: ['email', 'password', 'id', 'username'],
+      select: ['email', 'password', 'id', 'username', 'role'],
     });
   }
 
@@ -52,13 +52,7 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  async remove(id: number, userId: number) {
-    const currentUser = await this.UsersRepository.findOne({
-      where: { id: userId },
-    });
-    if (currentUser?.role !== Role.ADMIN) {
-      throw new ForbiddenException('Only administrators can delete users.');
-    }
+  async remove(id: number) {
     const userToDelete = await this.UsersRepository.findOne({ where: { id } });
     if (!userToDelete) {
       throw new NotFoundException(`User with id ${id} not found`);

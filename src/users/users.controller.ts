@@ -6,14 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import type { RequestWithUser } from '../auth/interfaces/request-with-user.interfaces';
 import { AuthGuard } from '../guards/auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -39,9 +39,10 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @Delete(':id')
-  remove(@Request() req: RequestWithUser, @Param('id') id: string) {
-    return this.usersService.remove(+id, +req.user.sub);
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
   }
 }

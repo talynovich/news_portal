@@ -21,6 +21,6 @@ export class News {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Users, (user) => user.news)
+  @ManyToOne(() => Users, (user) => user.news, { onDelete: 'SET NULL' })
   author: Users;
 }
