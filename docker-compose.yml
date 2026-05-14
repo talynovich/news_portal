@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Название сервиса базы данных
+  db:
+    image: postgres:15-alpine
+    container_name: nestjs-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: ny_times
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Название сервиса нашего приложения
+  api:
+    build: .
+    container_name: nestjs-api
+    restart: always
+    ports:
+      - "3000:3000"
+    # Прокидываем код для hot-reload (как обсуждали раньше)
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      # Важно: хост базы данных совпадает с названием сервиса (db)
+      DATABASE_URL: postgresql://postgres:admin123@db:5432/ny_times
+      NODE_ENV: development
+    # Ждем, пока поднимется база, прежде чем запускать API
+    depends_on:
+      - db
+
+# Описываем тома, чтобы данные БД не удалялись при перезапуске
+volumes:
+  postgres_data:
