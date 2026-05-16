@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { News } from '../../news/entities/news.entity';
 import { Role } from '../../enums/role.enum';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @Entity()
 export class Users {
@@ -21,4 +22,7 @@ export class Users {
 
   @OneToMany(() => News, (news) => news.author)
   news: News[];
+
+  @OneToMany(() => Comment, (comments) => comments.author)
+  comments: Comment[];
 }
