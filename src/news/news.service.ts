@@ -36,7 +36,6 @@ export class NewsService {
       relations: ['author', 'comments'],
       where: { id },
     });
-    console.log(news, 1111);
     if (!news) {
       throw new NotFoundException(`Nested with id ${id} not found`);
     }
