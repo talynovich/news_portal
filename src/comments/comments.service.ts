@@ -16,7 +16,7 @@ export class CommentsService {
     private newsRepository: Repository<News>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto) {
+  async create(createCommentDto: CreateCommentDto, userId: number) {
     const news = await this.newsRepository.findOne({
       where: { id: createCommentDto.newsId },
     });
@@ -26,11 +26,11 @@ export class CommentsService {
 
     const comment = this.commentRepository.create({
       text: createCommentDto.text,
+      author: { id: userId },
       news: {
         id: createCommentDto.newsId,
       },
     });
-
     return await this.commentRepository.save(comment);
   }
 

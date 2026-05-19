@@ -22,6 +22,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(AuthGuard)
   @Post()
   create(@Request() req: RequestWithUser, @Body() news: CreateNewsDto) {
