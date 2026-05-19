@@ -7,7 +7,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class NewsService {
@@ -33,9 +33,10 @@ export class NewsService {
 
   async findOne(id: number) {
     const news = await this.newsRepository.findOne({
-      relations: ['author'],
+      relations: ['author', 'comments'],
       where: { id },
     });
+    console.log(news, 1111);
     if (!news) {
       throw new NotFoundException(`Nested with id ${id} not found`);
     }
@@ -77,5 +78,23 @@ export class NewsService {
     }
 
     return { message: 'Deleted successfully' };
+  }
+
+  async search(searchQuery: string): Promise<News[]> {
+    if (!searchQuery || searchQuery.trim() === '') {
+      return [];
+    }
+    const formattedQuery = searchQuery.trim();
+
+    return await this.newsRepository.find({
+      where: [
+        { title: ILike(`%${formattedQuery}%`) },
+        { description: ILike(`%${formattedQuery}%`) },
+      ],
+      relations: ['author'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 }

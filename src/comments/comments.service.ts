@@ -39,4 +39,6 @@ export class CommentsService {
       relations: ['author', 'news'],
     });
   }
+
+  syb;
 }

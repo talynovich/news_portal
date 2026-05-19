@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { NewsService } from './news.service';
@@ -27,6 +28,11 @@ export class NewsController {
     return this.newsService.create(+req.user.sub, news);
   }
 
+  @Get('search')
+  async search(@Query('search') searchQuery: string) {
+    return await this.newsService.search(searchQuery);
+  }
+
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
@@ -34,6 +40,7 @@ export class NewsController {
     return this.newsService.findAll();
   }
 
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {

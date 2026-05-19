@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -29,7 +28,6 @@ export class UsersService {
       password: hashedPassword,
     });
     const savedUser = await this.UsersRepository.save(user);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...result } = savedUser;
     return result;
   }
@@ -42,14 +40,6 @@ export class UsersService {
 
   async findAll() {
     return await this.UsersRepository.find();
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
   }
 
   async remove(id: number) {
