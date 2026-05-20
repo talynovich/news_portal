@@ -16,9 +16,13 @@ export class CommentsService {
     private newsRepository: Repository<News>,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto, userId: number) {
+  async create(
+    createCommentDto: CreateCommentDto,
+    userId: number,
+    newsId: number,
+  ) {
     const news = await this.newsRepository.findOne({
-      where: { id: createCommentDto.newsId },
+      where: { id: newsId },
     });
     if (!news) {
       throw new NotFoundException('News not found');
@@ -28,7 +32,7 @@ export class CommentsService {
       text: createCommentDto.text,
       author: { id: userId },
       news: {
-        id: createCommentDto.newsId,
+        id: newsId,
       },
     });
     return await this.commentRepository.save(comment);
