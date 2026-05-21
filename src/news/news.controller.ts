@@ -9,7 +9,12 @@ import {
   UseGuards,
   Request,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  ParseIntPipe,
 } from '@nestjs/common';
+import multer from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../guards/auth.guard';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -37,8 +42,11 @@ export class NewsController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.newsService.findAll();
+  findAll(
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  ) {
+    return this.newsService.findAll(page, limit);
   }
 
   @ApiBearerAuth('JWT-auth')
@@ -62,5 +70,20 @@ export class NewsController {
   @Delete(':id')
   remove(@Request() req: RequestWithUser, @Param('id') id: string) {
     return this.newsService.remove(+id, +req.user.sub);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(AuthGuard)
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: multer.memoryStorage(),
+    }),
+  )
+  async upload(
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.newsService.upload(file);
   }
 }
