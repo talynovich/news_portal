@@ -28,7 +28,7 @@ export class UsersService {
       password: hashedPassword,
     });
     const savedUser = await this.UsersRepository.save(user);
-    const { password, ...result } = savedUser;
+    const { password: _password, ...result } = savedUser;
     return result;
   }
   findUserForAuth(email: string) {

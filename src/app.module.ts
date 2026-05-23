@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -9,6 +7,7 @@ import { News } from './news/entities/news.entity';
 import { Users } from './users/entities/user.entity';
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -27,8 +26,7 @@ import { Comment } from './comments/entities/comment.entity';
     AuthModule,
     NewsModule,
     CommentsModule,
+    UploadModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

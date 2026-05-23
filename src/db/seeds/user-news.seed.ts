@@ -21,7 +21,7 @@ export default class UserNewsSeeder implements Seeder {
       });
     }
 
-    const testUser = await userRepository.save({
+    const _testUser = await userRepository.save({
       email: 'user@test.ru',
       password: '$2b$10$iMnIFugpIUNPOuAiSBi3DeMMSUqrql2kcQ/65ftkxCrp.cyeAtuuG', // admin1234
       username: 'testUser', // user1234

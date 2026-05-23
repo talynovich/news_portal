@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import bcrypt from 'bcrypt';
@@ -33,13 +32,5 @@ export class AuthService {
 
   findAll() {
     return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
   }
 }

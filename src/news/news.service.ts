@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -7,8 +8,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { FindManyOptions, ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class NewsService {
@@ -16,16 +16,6 @@ export class NewsService {
     @InjectRepository(News) private newsRepository: Repository<News>,
   ) {}
 
-  private s3 = new S3Client({
-    region: process.env.S3_REGION,
-
-    endpoint: process.env.S3_ENDPOINT,
-
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY!,
-      secretAccessKey: process.env.S3_SECRET_KEY!,
-    },
-  });
   create(userId: number, dto: CreateNewsDto) {
     const news = this.newsRepository.create({
       ...dto,
@@ -37,18 +27,34 @@ export class NewsService {
   async findAll(
     page: number = 1,
     limit: number = 10,
+    search?: string,
   ): Promise<{
     data: News[];
     total: number;
   }> {
-    const [data, total] = await this.newsRepository.findAndCount({
+    const options: FindManyOptions<News> = {
       relations: ['author'],
       order: {
         createdAt: 'DESC',
       },
       take: limit,
       skip: (page - 1) * limit,
-    });
+    };
+
+    if (page == 0) {
+      throw new BadRequestException(`The limit parameter cannot be equal to 0`);
+    }
+
+    if (search && search.trim() !== '') {
+      const formattedQuery = search.trim();
+      options.where = [
+        { title: ILike(`%${formattedQuery}%`) },
+        { description: ILike(`%${formattedQuery}%`) },
+      ];
+    }
+
+    const [data, total] = await this.newsRepository.findAndCount(options);
+
     return {
       data,
       total,
@@ -101,41 +107,5 @@ export class NewsService {
     }
 
     return { message: 'Deleted successfully' };
-  }
-
-  async search(searchQuery: string): Promise<News[]> {
-    if (!searchQuery || searchQuery.trim() === '') {
-      return [];
-    }
-    const formattedQuery = searchQuery.trim();
-
-    return await this.newsRepository.find({
-      where: [
-        { title: ILike(`%${formattedQuery}%`) },
-        { description: ILike(`%${formattedQuery}%`) },
-      ],
-      relations: ['author'],
-      order: {
-        createdAt: 'DESC',
-      },
-    });
-  }
-
-  async upload(file: Express.Multer.File) {
-    const key = Date.now() + '-' + file.originalname;
-
-    await this.s3.send(
-      new PutObjectCommand({
-        Bucket: 'e0548cd6-7b4158dc-a1b2c3d4',
-        Key: 'AKIAIOSFODNN7EXAMPLE',
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      }),
-    );
-
-    return {
-      key,
-      url: `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}/${key}`,
-    };
   }
 }

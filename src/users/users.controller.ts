@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -27,6 +28,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')

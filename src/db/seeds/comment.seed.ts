@@ -6,7 +6,7 @@ import { Users } from '../../users/entities/user.entity';
 export default class CommentSeed implements Seeder {
   public async run(
     dataSource: DataSource,
-    factoryManager: SeederFactoryManager,
+    _factoryManager: SeederFactoryManager,
   ): Promise<any> {
     const commentRepository = dataSource.getRepository(Comment);
     const userRepository = dataSource.getRepository(Users);
